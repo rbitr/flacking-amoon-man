@@ -160,11 +160,19 @@
 
   // --- score & combo ---
   // combo grows by COMBO_GAIN on each hit and decays toward 1 at COMBO_DECAY/sec.
-  // score per hit is floor(combo). At ~1 hit/sec combo settles around 2.0;
-  // at the practical max cadence (~0.7s) it reaches ~2.7. A miss resets both.
+  // score per hit is floor(combo). A miss resets both to 0/1.
+  // Spawn delay shrinks with combo: SPAWN_BASE at combo=1, dropping by
+  // SPAWN_REDUCTION ms per combo level, floored at SPAWN_MIN. This gives
+  // positive feedback — getting in the zone makes the zone easier to stay in.
   const COMBO_GAIN = 0.5;
   const COMBO_DECAY = 0.5; // per second
   const COMBO_MAX = 8;
+  const SPAWN_BASE = 700;
+  const SPAWN_MIN = 200;
+  const SPAWN_REDUCTION = 200; // ms removed per +1 combo
+  function spawnDelay() {
+    return Math.max(SPAWN_MIN, SPAWN_BASE - (combo - 1) * SPAWN_REDUCTION);
+  }
   let score = 0;
   let combo = 1;
   let highScore = parseInt(localStorage.getItem('flack.highScore') || '0', 10) || 0;
@@ -297,7 +305,7 @@
     shake = 14;
     playPop();
     currentMan = null;
-    setTimeout(spawnMan, 700);
+    setTimeout(spawnMan, spawnDelay());
   }
 
   // --- input ---
