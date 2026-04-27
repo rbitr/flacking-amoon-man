@@ -273,6 +273,7 @@
   window.addEventListener('keydown', (e) => {
     ensureAudio();
     if (e.repeat) return;
+    if (document.getElementById('splash')) return; // splash still up, ignore keys
     if (e.code === 'ShiftLeft') handleShift('left');
     else if (e.code === 'ShiftRight') handleShift('right');
   });
